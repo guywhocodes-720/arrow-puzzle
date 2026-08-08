@@ -31,6 +31,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   const [exitingCellIds, setExitingCellIds] = useState<string[]>([]);
   const [errorCellId, setErrorCellId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [streak, setStreak] = useState<number>(0);
 
   useEffect(() => {
     setIsLoading(true);
@@ -44,7 +45,6 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   const isWon = cells.every((cell) => cell === null);
   const isDeadlocked = !isWon && !hasValidMoves(cells, gridSize);
 
-  // Auto-advance to next level when won
   useEffect(() => {
     if (isWon && !isLoading && initialCells.some(c => c !== null)) {
       const timer = setTimeout(() => {
@@ -52,7 +52,6 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       }, 1200);
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWon]);
 
   const handleResetLevel = () => {
@@ -67,7 +66,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
     const nextLvl = isWon ? levelNumber + 1 : levelNumber;
     if (isWon) {
       setLevelNumber(nextLvl);
-      await saveLevelProgress(nextLvl)
+      await saveLevelProgress(nextLvl, streak);
     }
 
     setIsLoading(true);
@@ -90,6 +89,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
     const activeCells = cells.map(c => (c !== null && exitingCellIds.includes(c.id)) ? null : c);
 
     if (isPathClear(activeCells, row, col, direction, gridSize)) {
+      setStreak((prev) => prev + 1);
       setExitingCellIds((prev) => [...prev, clickedCell.id]);
 
       setTimeout(() => {
@@ -101,7 +101,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
         setExitingCellIds((prev) => prev.filter(id => id !== clickedCell.id));
       }, 800);
     } else {
-      // Path is blocked, trigger error shake
+      setStreak(0);
       setErrorCellId(clickedCell.id);
       setTimeout(() => {
         setErrorCellId((current) => current === clickedCell.id ? null : current);
@@ -117,7 +117,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
 
         {/* Header & Status */}
         <div className="flex flex-col items-center md:items-start gap-2 w-full">
-          <GameHeader levelNumber={levelNumber} gridSize={gridSize} />
+          <GameHeader levelNumber={levelNumber} gridSize={gridSize} streak={streak} />
           <StatusBanner isWon={isWon} isDeadlocked={isDeadlocked} levelNumber={levelNumber} />
         </div>
 

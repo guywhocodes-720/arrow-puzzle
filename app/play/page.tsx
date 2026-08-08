@@ -21,7 +21,7 @@ export default async function PlayPage() {
 
   }
   return (
-    <main className="flex-1 flex flex-col items-center p-6 sm:p-12 w-full mx-auto">
+    <main className="flex-1 flex flex-col items-center p-6 sm:p-12 w-full mx-auto overflow-hidden relative">
       <Board initialLevel={initialLevel} />
     </main>
   );

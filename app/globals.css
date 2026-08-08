@@ -56,3 +56,14 @@ body {
 .animate-slide-left {
   animation: slideLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Keyframe animations for blocked arrows (error shake) */
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+.animate-error-shake {
+  animation: errorShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}

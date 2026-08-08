@@ -33,10 +33,19 @@ export async function signup(formData: FormData) {
         password: formData.get('password') as string,
     }
 
-    const { error } = await supabase.auth.signUp(data)
+    const { error, data: authData } = await supabase.auth.signUp(data)
 
     if (error) {
         redirect(`/register?message=${encodeURIComponent(error.message)}`)
+    }
+
+    const guestLevelStr = cookieStore.get("guest_level")?.value;
+    if (guestLevelStr && authData.user) {
+        const guestLevel = parseInt(guestLevelStr, 10);
+        if (guestLevel > 1) {
+            await supabase.from("profiles").update({ highest_level: guestLevel }).eq("id", authData.user.id);
+            cookieStore.delete("guest_level")
+        }
     }
 
     revalidatePath('/', 'layout')

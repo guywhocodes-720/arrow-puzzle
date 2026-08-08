@@ -28,9 +28,9 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
 
   const [initialCells, setInitialCells] = useState<BoardState>(createSolvableLevel);
   const [cells, setCells] = useState<BoardState>(initialCells);
-  const [exitingCellId, setExitingCellId] = useState<string | null>(null);
+  const [exitingCellIds, setExitingCellIds] = useState<string[]>([]);
+  const [errorCellId, setErrorCellId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
 
   useEffect(() => {
     setIsLoading(true);
@@ -39,18 +39,31 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       setCells(randomLevel);
       setIsLoading(false);
     });
-  }, []);
+  }, [initialLevel]);
 
   const isWon = cells.every((cell) => cell === null);
   const isDeadlocked = !isWon && !hasValidMoves(cells, gridSize);
 
+  // Auto-advance to next level when won
+  useEffect(() => {
+    if (isWon && !isLoading && initialCells.some(c => c !== null)) {
+      const timer = setTimeout(() => {
+        handleNewLevel();
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWon]);
+
   const handleResetLevel = () => {
-    setExitingCellId(null);
+    setExitingCellIds([]);
+    setErrorCellId(null);
     setCells(initialCells);
   };
 
   const handleNewLevel = async () => {
-    setExitingCellId(null);
+    setExitingCellIds([]);
+    setErrorCellId(null);
     const nextLvl = isWon ? levelNumber + 1 : levelNumber;
     if (isWon) {
       setLevelNumber(nextLvl);
@@ -66,34 +79,42 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   };
 
   const handleCellClick = (row: number, col: number, direction: Direction) => {
-    if (isWon || exitingCellId !== null || isLoading) return;
+    if (isWon || isLoading) return;
 
     const clickedCell = cells.find(
       (cell) => cell !== null && cell.row === row && cell.col === col
     );
 
-    if (!clickedCell) return;
+    if (!clickedCell || exitingCellIds.includes(clickedCell.id)) return;
 
-    if (isPathClear(cells, row, col, direction, gridSize)) {
-      setExitingCellId(clickedCell.id);
+    const activeCells = cells.map(c => (c !== null && exitingCellIds.includes(c.id)) ? null : c);
+
+    if (isPathClear(activeCells, row, col, direction, gridSize)) {
+      setExitingCellIds((prev) => [...prev, clickedCell.id]);
 
       setTimeout(() => {
         setCells((prevCells) =>
           prevCells.map((cell) =>
-            cell !== null && cell.row === row && cell.col === col ? null : cell
+            cell !== null && cell.id === clickedCell.id ? null : cell
           )
         );
-        setExitingCellId(null);
+        setExitingCellIds((prev) => prev.filter(id => id !== clickedCell.id));
       }, 800);
+    } else {
+      // Path is blocked, trigger error shake
+      setErrorCellId(clickedCell.id);
+      setTimeout(() => {
+        setErrorCellId((current) => current === clickedCell.id ? null : current);
+      }, 300);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl h-full min-h-[50vh] gap-8 mt-4 md:mt-12">
-      
+    <div className="flex-1 flex flex-col md:flex-row items-center justify-between w-full max-w-5xl gap-8 mt-2 md:mt-8">
+
       {/* Information & Controls (Top on Mobile, Left on Desktop) */}
       <div className="flex flex-col items-center md:items-start justify-center gap-6 w-full md:w-auto shrink-0">
-        
+
         {/* Header & Status */}
         <div className="flex flex-col items-center md:items-start gap-2 w-full">
           <GameHeader levelNumber={levelNumber} gridSize={gridSize} />
@@ -134,7 +155,8 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
           {cells.map((cell, index) => {
             const row = Math.floor(index / gridSize);
             const col = index % gridSize;
-            const isExiting = cell !== null && cell.id === exitingCellId;
+            const isExiting = cell !== null && exitingCellIds.includes(cell.id);
+            const isError = cell !== null && cell.id === errorCellId;
 
             return (
               <Cell
@@ -143,6 +165,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
                 row={row}
                 col={col}
                 isExiting={isExiting}
+                isError={isError}
                 onClick={handleCellClick}
               />
             );

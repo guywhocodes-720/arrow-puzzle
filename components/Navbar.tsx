@@ -19,11 +19,16 @@ export async function Navbar() {
             Play
           </Link>
           {user ? (
-            <form action={logout}>
-              <button type="submit" className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
-                Sign Out
-              </button>
-            </form>
+            <div className="flex items-center gap-6">
+              <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest hidden sm:inline-block">
+                {user.email?.split('@')[0]}
+              </span>
+              <form action={logout}>
+                <button type="submit" className="text-sm font-medium text-black dark:text-white hover:text-zinc-500 dark:hover:text-zinc-400 transition-colors cursor-pointer">
+                  Sign Out
+                </button>
+              </form>
+            </div>
           ) : (
             <Link href="/login" className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
               Sign In

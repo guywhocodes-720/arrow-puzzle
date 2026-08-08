@@ -1,5 +1,6 @@
 import { login } from './action'
 import Link from 'next/link'
+import { SubmitButton } from '@/components/SubmitButton'
 
 export default async function LoginPage({
     searchParams,
@@ -40,12 +41,13 @@ export default async function LoginPage({
                     />
                 </div>
 
-                <button
+                <SubmitButton
                     formAction={login}
-                    className="w-full py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 font-semibold text-sm tracking-widest uppercase transition-colors"
+                    pendingText="Authenticating..."
+                    className="w-full py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 font-semibold text-sm tracking-widest uppercase transition-colors disabled:opacity-50"
                 >
                     Sign In
-                </button>
+                </SubmitButton>
 
                 {params?.message && (
                     <p className="mt-8 text-sm text-red-600 dark:text-red-400 text-center font-medium">

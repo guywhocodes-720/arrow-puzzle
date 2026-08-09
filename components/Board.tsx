@@ -155,7 +155,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       </div>
 
       {/* The Board (Middle on Mobile, Right on Desktop) */}
-      <div className="flex-1 flex items-center md:justify-end justify-center w-full mt-auto mb-auto overflow-hidden px-2">
+      <div className="flex-1 flex items-center md:justify-end justify-center w-full mt-auto mb-auto px-2">
         <div
           className="grid gap-1 sm:gap-2 relative w-full max-w-[85vw] md:max-w-[500px] aspect-square"
           style={{

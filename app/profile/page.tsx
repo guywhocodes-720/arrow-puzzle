@@ -30,19 +30,19 @@ export default async function ProfilePage() {
     return (
         <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 py-12">
 
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-border pb-8 mb-8">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-primary/10 text-primary flex items-center justify-center text-4xl sm:text-5xl font-semibold shadow-xl border border-primary/20 shrink-0">
+            {/* Elegant Header Section */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border pb-6 mb-8">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-2xl sm:text-3xl font-semibold shadow-md border border-primary/20 shrink-0">
                     {initial}
                 </div>
-                <div className="flex flex-col items-center sm:items-start justify-center pt-2">
+                <div className="flex flex-col items-center sm:items-start justify-center pt-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-3xl sm:text-4xl font-semibold tracking-widest text-foreground uppercase">
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-widest text-foreground uppercase">
                             {displayName}
                         </h1>
                         <EditNameDialog currentName={displayName} />
                     </div>
-                    <p className="text-sm sm:text-base text-muted-foreground uppercase tracking-widest mt-1">
+                    <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-widest mt-1 font-medium">
                         {user.email}
                     </p>
                 </div>

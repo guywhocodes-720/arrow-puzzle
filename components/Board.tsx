@@ -224,6 +224,11 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
             <DialogDescription className="text-center text-lg mt-2 font-medium">
               You successfully beat Level {levelNumber}.
               {streak > 1 && <span className="block mt-2 font-semibold text-primary">You are on a {streak} win streak! 🔥</span>}
+
+              <Link href="/leaderboard" className="block mt-4 text-sm text-muted-foreground hover:text-primary transition-colors underline underline-offset-4">
+                Click here to see leaderboard
+              </Link>
+
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-center mt-6">

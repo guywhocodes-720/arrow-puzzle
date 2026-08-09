@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { logout } from "@/app/login/action";
-import { ModeToggle } from "@/components/mode-toggle";
 
 interface NavbarClientProps {
   username: string | null;
@@ -66,12 +65,10 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
               Sign In
             </Link>
           )}
-          <ModeToggle />
         </div>
 
-        {/* Mobile: theme toggle + hamburger */}
+        {/* Mobile: hamburger */}
         <div className="flex sm:hidden items-center gap-3">
-          <ModeToggle />
           <button
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}

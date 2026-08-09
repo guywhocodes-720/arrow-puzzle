@@ -69,12 +69,7 @@ export default async function LeaderboardPage() {
                             </div>
 
                             <span
-                                className={`font-medium text-base uppercase tracking-wider truncate ${
-                                    isFirst ? "text-amber-500" :
-                                    isSecond ? "text-slate-300" :
-                                    isThird ? "text-amber-600" :
-                                    "text-foreground"
-                                }`}
+                                className="font-medium text-base uppercase tracking-wider truncate text-foreground"
                                 title={player.display_name || "Unknown Player"}
                             >
                                 {player.display_name || "Unknown Player"}

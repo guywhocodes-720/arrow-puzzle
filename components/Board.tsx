@@ -155,11 +155,12 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       </div>
 
       {/* The Board (Middle on Mobile, Right on Desktop) */}
-      <div className="flex-1 flex items-center md:justify-end justify-center w-full mt-auto mb-auto">
+      <div className="flex-1 flex items-center md:justify-end justify-center w-full mt-auto mb-auto overflow-hidden px-2">
         <div
-          className="grid gap-1 sm:gap-2 relative"
+          className="grid gap-1 sm:gap-2 relative w-full max-w-[85vw] md:max-w-[500px] aspect-square"
           style={{
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
           }}
         >
           {/* Loading Overlay */}
@@ -198,7 +199,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       <Dialog open={isGameOver} onOpenChange={handleGameOverChange}>
         <DialogContent className="sm:max-w-md text-center outline-none border-none">
           <DialogHeader className="flex flex-col items-center">
-            <DialogTitle className="text-2xl font-black text-destructive uppercase tracking-widest mt-2">Game Over! 💔</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-destructive uppercase tracking-widest mt-2">Game Over! 💔</DialogTitle>
             <DialogDescription className="text-center text-lg mt-2 font-medium">
               You ran out of lives! But don&apos;t worry, you can try this puzzle again.
             </DialogDescription>
@@ -207,7 +208,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
             <button
               type="button"
               onClick={handleResetLevel}
-              className="px-8 py-3 bg-destructive text-destructive-foreground font-bold tracking-widest uppercase hover:bg-destructive/90 transition-colors rounded-xl"
+              className="px-8 py-3 bg-destructive text-destructive-foreground font-medium tracking-widest uppercase hover:brightness-110 rounded-xl border-b-[4px] border-destructive/50 active:translate-y-[2px] active:border-b-[2px] duration-75"
             >
               Try Again
             </button>
@@ -219,17 +220,17 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       <Dialog open={isLevelWonModalOpen} onOpenChange={handleLevelWonChange}>
         <DialogContent className="sm:max-w-md text-center outline-none border-none">
           <DialogHeader className="flex flex-col items-center">
-            <DialogTitle className="text-2xl font-black text-primary uppercase tracking-widest mt-2">Level Cleared! 🎉</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-primary uppercase tracking-widest mt-2">Level Cleared! 🎉</DialogTitle>
             <DialogDescription className="text-center text-lg mt-2 font-medium">
               You successfully beat Level {levelNumber}.
-              {streak > 1 && <span className="block mt-2 font-bold text-primary">You are on a {streak} win streak! 🔥</span>}
+              {streak > 1 && <span className="block mt-2 font-semibold text-primary">You are on a {streak} win streak! 🔥</span>}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-center mt-6">
             <button
               type="button"
               onClick={handleNewLevel}
-              className="px-8 py-3 bg-primary text-primary-foreground font-bold tracking-widest uppercase hover:bg-primary/90 transition-colors rounded-xl"
+              className="px-8 py-3 bg-primary text-primary-foreground font-medium tracking-widest uppercase hover:brightness-110 rounded-xl border-b-[4px] border-primary/50 active:translate-y-[2px] active:border-b-[2px] duration-75"
             >
               Next Level
             </button>

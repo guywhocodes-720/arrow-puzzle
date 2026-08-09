@@ -22,7 +22,7 @@ export default async function HomePage() {
 
         <Link
           href="/play"
-          className="px-14 py-5 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base tracking-widest uppercase transition-colors w-full sm:w-auto text-center shadow-xl"
+          className="px-14 py-5 bg-primary text-primary-foreground font-medium text-sm sm:text-base tracking-widest uppercase rounded-xl border-b-[4px] border-primary/50 hover:brightness-110 active:translate-y-[2px] active:border-b-[2px] duration-75 w-full sm:w-auto text-center shadow-xl"
         >
           {user ? "Resume Game" : "Play Now"}
         </Link>

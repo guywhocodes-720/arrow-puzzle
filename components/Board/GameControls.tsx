@@ -18,9 +18,9 @@ export const GameControls: React.FC<GameControlsProps> = ({
             <button
                 type="button"
                 onClick={onReset}
-                className={`px-6 py-2 border text-xs font-semibold uppercase tracking-widest transition-colors cursor-pointer ${isGameOver
-                    ? 'border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground'
-                    : 'border-input text-foreground hover:bg-secondary hover:text-secondary-foreground'
+                className={`px-6 py-2 text-xs font-medium uppercase tracking-widest cursor-pointer rounded-xl duration-75 ${isGameOver
+                    ? 'bg-destructive text-destructive-foreground hover:brightness-110 border-b-[4px] border-destructive/50 active:translate-y-[2px] active:border-b-[2px]'
+                    : 'bg-secondary text-secondary-foreground hover:brightness-110 border-b-[4px] border-secondary/50 active:translate-y-[2px] active:border-b-[2px]'
                     }`}
             >
                 {isGameOver ? "Try Again" : "Reset"}
@@ -29,7 +29,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
             <button
                 type="button"
                 onClick={onNewLevel}
-                className="px-6 py-2 border border-foreground text-xs font-semibold text-foreground hover:bg-foreground hover:text-background uppercase tracking-widest transition-colors cursor-pointer"
+                className="px-6 py-2 bg-secondary text-secondary-foreground text-xs font-medium uppercase tracking-widest cursor-pointer rounded-xl border-b-[4px] border-secondary/50 hover:brightness-110 active:translate-y-[2px] active:border-b-[2px] duration-75"
             >
                 {isWon ? "Next Level" : "Random Puzzle"}
             </button>

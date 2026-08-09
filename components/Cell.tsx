@@ -25,26 +25,25 @@ const ANIMATION_CLASSES: Record<Direction, string> = {
 };
 
 export const Cell: React.FC<CellProps> = ({ data, row, col, isExiting, isError, onClick }) => {
-    // Render empty slot if arrow has cleared
     if (!data) {
         return (
             <div
-                className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20"
+                className="w-full h-full aspect-square"
                 aria-hidden="true"
             />
         );
     }
 
-    let animationClass = isExiting ? `${ANIMATION_CLASSES[data.direction]} pointer-events-none z-50` : '';
+    let animationClass = isExiting ? `${ANIMATION_CLASSES[data.direction]} pointer-events-none z-50 text-primary` : 'text-foreground';
     if (isError) {
-        animationClass = 'animate-error-shake text-destructive';
+        animationClass = 'animate-error-shake text-destructive rounded-lg';
     }
 
     return (
         <button
             type="button"
             onClick={() => onClick(row, col, data.direction)}
-            className={`w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl sm:text-5xl font-black text-foreground active:opacity-70 active:scale-95 transition-all cursor-pointer select-none focus:outline-none touch-manipulation ${animationClass}`}
+            className={`w-full h-full aspect-square flex items-center justify-center text-[clamp(1.5rem,4vw,3rem)] md:text-[clamp(2rem,3vw,3.5rem)] font-semibold active:scale-95 cursor-pointer select-none focus:outline-none touch-manipulation transition-[transform,color,background-color] duration-75 ${animationClass}`}
             aria-label={`Cell at row ${row}, col ${col} pointing ${data.direction}`}
         >
             {ARROW_SYMBOLS[data.direction]}

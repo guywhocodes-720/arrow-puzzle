@@ -26,7 +26,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ levelNumber, streak, liv
       </div>
 
       {streak > 0 && (
-        <span className='text-sm font-bold text-primary uppercase tracking-widest'>
+        <span className='text-sm font-semibold text-primary uppercase tracking-widest'>
           🔥 {streak} Streak
         </span>
       )}

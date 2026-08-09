@@ -12,7 +12,6 @@ import {
   isPathClear
 } from "@/types/game";
 import { Cell } from "./Cell";
-import { ModeToggle } from "./mode-toggle";
 import { GameHeader } from "./Board/GameHeader";
 import { GameControls } from "./Board/GameControls";
 import {
@@ -26,9 +25,10 @@ import { saveLevelProgress } from "@/app/play/action";
 
 interface BoardProps {
   initialLevel?: number;
+  initialStreak?: number;
 }
 
-export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
+export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 0 }) => {
   const [levelNumber, setLevelNumber] = useState<number>(initialLevel);
   const gridSize = getGridSizeForLevel(levelNumber);
 
@@ -37,9 +37,11 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   const [exitingCellIds, setExitingCellIds] = useState<string[]>([]);
   const [errorCellId, setErrorCellId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [streak, setStreak] = useState<number>(0);
+  const [streak, setStreak] = useState<number>(initialStreak);
+  const streakRef = React.useRef(initialStreak);
   const [lives, setLives] = useState<number>(3);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [isLevelWonModalOpen, setIsLevelWonModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -51,7 +53,13 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   }, [initialLevel]);
 
   const isWon = cells.every((cell) => cell === null);
-  const isDeadlocked = !isWon && !hasValidMoves(cells, gridSize);
+
+  useEffect(() => {
+    if (isWon && !isLoading && initialCells.some(c => c !== null)) {
+      setIsLevelWonModalOpen(true);
+    }
+  }, [isWon, isLoading, initialCells]);
+
 
 
   const handleResetLevel = () => {
@@ -60,18 +68,18 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
     setCells(initialCells);
     setLives(3);
     setIsGameOver(false);
+    // Streak is NOT reset here — only a wrong click resets it
   };
 
   const handleNewLevel = async () => {
+    // Close the modal first so it can't re-trigger during async load
+    setIsLevelWonModalOpen(false);
     setExitingCellIds([]);
     setErrorCellId(null);
     setLives(3);
     setIsGameOver(false);
-    const nextLvl = isWon ? levelNumber + 1 : levelNumber;
-    if (isWon) {
-      setLevelNumber(nextLvl);
-      await saveLevelProgress(nextLvl, streak);
-    }
+    const nextLvl = levelNumber + 1;
+    setLevelNumber(nextLvl);
 
     setIsLoading(true);
     generateProceduralLevelAsync(nextLvl).then((newLevel) => {
@@ -93,7 +101,21 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
     const activeCells = cells.map(c => (c !== null && exitingCellIds.includes(c.id)) ? null : c);
 
     if (isPathClear(activeCells, row, col, direction, gridSize)) {
-      setStreak((prev) => prev + 1);
+      const nextStreak = streakRef.current + 1;
+      streakRef.current = nextStreak;
+      setStreak(nextStreak);
+
+      // Check if this is the last cell being cleared (winning move).
+      // We fire the save HERE before the 800ms animation, so by the time
+      // the modal appears and the user can click any link, the DB write
+      // is already done. If we save in useEffect, navigation can abort it.
+      const remainingAfterExit = activeCells.filter(
+        c => c !== null && c.id !== clickedCell.id
+      );
+      if (remainingAfterExit.length === 0) {
+        saveLevelProgress(levelNumber + 1, nextStreak);
+      }
+
       setExitingCellIds((prev) => [...prev, clickedCell.id]);
 
       setTimeout(() => {
@@ -105,7 +127,9 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
         setExitingCellIds((prev) => prev.filter(id => id !== clickedCell.id));
       }, 800);
     } else {
+      // Wrong click: immediately break the streak
       setStreak(0);
+      streakRef.current = 0;
       setErrorCellId(clickedCell.id);
 
       setLives((prevLives) => {
@@ -121,15 +145,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
     }
   };
 
-  const handleGameOverChange = (open: boolean) => {
-    if (!open && isGameOver) handleResetLevel();
-  };
 
-  const isLevelWonModalOpen = isWon && !isLoading && initialCells.some(c => c !== null);
-
-  const handleLevelWonChange = (open: boolean) => {
-    if (!open && isWon) handleNewLevel();
-  };
 
   return (
     <div className="flex-1 flex flex-col md:flex-row items-center justify-between w-full max-w-5xl gap-8 mt-2 md:mt-8">
@@ -157,7 +173,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
       {/* The Board (Middle on Mobile, Right on Desktop) */}
       <div className="flex-1 flex items-center md:justify-end justify-center w-full mt-auto mb-auto px-2">
         <div
-          className="grid gap-1 sm:gap-2 relative w-full max-w-[85vw] md:max-w-[500px] aspect-square"
+          className="grid gap-1 sm:gap-2 relative w-full max-w-[92vw] sm:max-w-[75vw] md:max-w-[480px] aspect-square"
           style={{
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
@@ -195,9 +211,9 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
           })}
         </div>
       </div>
-      {/* Game Over Modal */}
-      <Dialog open={isGameOver} onOpenChange={handleGameOverChange}>
-        <DialogContent className="sm:max-w-md text-center outline-none border-none">
+      {/* Game Over Modal - not dismissible by backdrop click */}
+      <Dialog open={isGameOver} onOpenChange={() => { }}>
+        <DialogContent className="sm:max-w-md text-center outline-none border-none" showCloseButton={false}>
           <DialogHeader className="flex flex-col items-center">
             <DialogTitle className="text-2xl font-semibold text-destructive uppercase tracking-widest mt-2">Game Over! 💔</DialogTitle>
             <DialogDescription className="text-center text-lg mt-2 font-medium">
@@ -216,9 +232,9 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Level Won Modal */}
-      <Dialog open={isLevelWonModalOpen} onOpenChange={handleLevelWonChange}>
-        <DialogContent className="sm:max-w-md text-center outline-none border-none">
+      {/* Level Won Modal - not dismissible by backdrop click */}
+      <Dialog open={isLevelWonModalOpen} onOpenChange={() => { }}>
+        <DialogContent className="sm:max-w-md text-center outline-none border-none" showCloseButton={false}>
           <DialogHeader className="flex flex-col items-center">
             <DialogTitle className="text-2xl font-semibold text-primary uppercase tracking-widest mt-2">Level Cleared! 🎉</DialogTitle>
             <DialogDescription className="text-center text-lg mt-2 font-medium">

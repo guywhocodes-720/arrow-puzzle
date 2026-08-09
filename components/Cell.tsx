@@ -44,7 +44,7 @@ export const Cell: React.FC<CellProps> = ({ data, row, col, isExiting, isError, 
         <button
             type="button"
             onClick={() => onClick(row, col, data.direction)}
-            className={`w-full h-full aspect-square flex items-center justify-center font-bold text-[clamp(2rem,6vw,4rem)] md:text-[clamp(2.5rem,4vw,4.5rem)] active:scale-95 cursor-pointer select-none focus:outline-none touch-manipulation transition-[transform,color,background-color] duration-75 ${animationClass}`}
+            className={`w-full h-full aspect-square flex items-center justify-center font-bold text-[clamp(1.75rem,8vw,3.5rem)] md:text-[clamp(2rem,3.5vw,3.5rem)] active:scale-95 cursor-pointer select-none focus:outline-none touch-manipulation transition-[transform,color,background-color] duration-75 ${animationClass}`}
             aria-label={`Cell at row ${row}, col ${col} pointing ${data.direction}`}
         >
             <span className="drop-shadow-sm leading-none">{ARROW_SYMBOLS[data.direction]}</span>

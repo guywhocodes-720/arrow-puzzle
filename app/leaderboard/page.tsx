@@ -1,29 +1,29 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { Trophy } from "lucide-react";
+import { Trophy, Flame } from "lucide-react";
 
-export const revalidate = 60;
+
 
 export default async function LeaderboardPage() {
     const cookieStore = await cookies();
     const supabase = createClient(cookieStore);
 
-    const { data: leaderboard } = await supabase
+    const { data: leaderboard, error } = await supabase
         .from("profiles")
-        .select("id, display_name, highest_level")
+        .select("id, display_name, highest_level, highest_streak")
         .order("highest_level", { ascending: false })
         .limit(50);
 
     return (
         <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 py-12">
 
-            {/* Elegant Header Section */}
+            {/* Header */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border pb-6 mb-8">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-md border border-primary/20 shrink-0">
                     <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
                 </div>
                 <div className="flex flex-col items-center sm:items-start justify-center pt-1">
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-widest text-foreground uppercase">
+                    <h1 className="text-2xl sm:text-3xl font-semibold tracking-widest text-foreground uppercase">
                         Leaderboard
                     </h1>
                     <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-widest mt-1 font-medium">
@@ -31,6 +31,16 @@ export default async function LeaderboardPage() {
                     </p>
                 </div>
             </div>
+
+            {/* Column Headers */}
+            {leaderboard && leaderboard.length > 0 && (
+                <div className="grid grid-cols-[3rem_1fr_auto_auto] gap-4 px-4 mb-2">
+                    <div />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Player</span>
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest text-right">Flawless Streak</span>
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest text-right">Level</span>
+                </div>
+            )}
 
             {/* Leaderboard List */}
             <div className="flex flex-col gap-3">
@@ -42,34 +52,42 @@ export default async function LeaderboardPage() {
                     return (
                         <div
                             key={player.id}
-                            className={`flex items-center justify-between p-4 rounded-xl border ${isFirst ? "bg-amber-500/10 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]" :
-                                    isSecond ? "bg-slate-300/10 border-slate-300/50" :
-                                        isThird ? "bg-amber-700/10 border-amber-700/50" :
-                                            "bg-popover border-border"
-                                }`}
+                            className={`grid grid-cols-[3rem_1fr_auto_auto] gap-4 items-center p-4 rounded-xl border ${
+                                isFirst ? "bg-amber-500/10 border-amber-500/40" :
+                                isSecond ? "bg-slate-400/10 border-slate-400/40" :
+                                isThird ? "bg-amber-700/10 border-amber-700/40" :
+                                "bg-popover border-border"
+                            }`}
                         >
-                            <div className="flex items-center gap-4 flex-1 min-w-0 mr-4">
-                                <div className={`w-10 h-10 shrink-0 flex items-center justify-center font-bold text-lg rounded-full ${isFirst ? "bg-amber-500 text-white" :
-                                        isSecond ? "bg-slate-300 text-slate-800" :
-                                            isThird ? "bg-amber-700 text-white" :
-                                                "bg-muted text-muted-foreground"
-                                    }`}>
-                                    {index + 1}
-                                </div>
-                                <span
-                                    className={`font-semibold text-lg uppercase tracking-wider truncate ${isFirst ? "text-amber-500" :
-                                            isSecond ? "text-slate-300" :
-                                                isThird ? "text-amber-700" :
-                                                    "text-foreground"
-                                        }`}
-                                    title={player.display_name || "Unknown Player"}
-                                >
-                                    {player.display_name || "Unknown Player"}
-                                </span>
+                            <div className={`w-10 h-10 shrink-0 flex items-center justify-center font-semibold text-base rounded-full ${
+                                isFirst ? "bg-amber-500 text-white" :
+                                isSecond ? "bg-slate-400 text-slate-900" :
+                                isThird ? "bg-amber-700 text-white" :
+                                "bg-muted text-muted-foreground"
+                            }`}>
+                                {index + 1}
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                                <span className="text-sm text-muted-foreground uppercase tracking-widest">Level</span>
-                                <span className="text-2xl font-black text-primary">{player.highest_level || 1}</span>
+
+                            <span
+                                className={`font-medium text-base uppercase tracking-wider truncate ${
+                                    isFirst ? "text-amber-500" :
+                                    isSecond ? "text-slate-300" :
+                                    isThird ? "text-amber-600" :
+                                    "text-foreground"
+                                }`}
+                                title={player.display_name || "Unknown Player"}
+                            >
+                                {player.display_name || "Unknown Player"}
+                            </span>
+
+                            <div className="flex items-center gap-1.5 justify-end">
+                                <span className="text-xl font-semibold text-foreground">{player.highest_streak || 0}</span>
+                                <Flame className="w-4 h-4 text-primary" />
+                            </div>
+
+                            <div className="flex items-center gap-1.5 justify-end">
+                                <span className="text-xs text-muted-foreground uppercase tracking-widest">Lvl</span>
+                                <span className="text-2xl font-semibold text-primary">{player.highest_level || 1}</span>
                             </div>
                         </div>
                     );
@@ -84,3 +102,4 @@ export default async function LeaderboardPage() {
         </div>
     );
 }
+

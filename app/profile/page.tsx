@@ -81,7 +81,7 @@ export default async function ProfilePage() {
                         <div className="absolute right-[-10%] top-[-10%] opacity-5 group-hover:opacity-10 transition-opacity">
                             <Flame className="w-32 h-32" />
                         </div>
-                        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-4 z-10">Best Streak</span>
+                        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-4 z-10">Flawless Streak</span>
                         <div className="flex items-center gap-2 z-10">
                             <span className="text-5xl font-semibold text-primary">{highestStreak}</span>
                             <Flame className="w-8 h-8 text-primary ml-1 mt-2" />

@@ -14,8 +14,14 @@ import {
 import { Cell } from "./Cell";
 import { ModeToggle } from "./mode-toggle";
 import { GameHeader } from "./Board/GameHeader";
-import { StatusBanner } from "./Board/StatusBanner";
 import { GameControls } from "./Board/GameControls";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { saveLevelProgress } from "@/app/play/action";
 
 interface BoardProps {
@@ -32,6 +38,8 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   const [errorCellId, setErrorCellId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [streak, setStreak] = useState<number>(0);
+  const [lives, setLives] = useState<number>(3);
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -45,24 +53,20 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   const isWon = cells.every((cell) => cell === null);
   const isDeadlocked = !isWon && !hasValidMoves(cells, gridSize);
 
-  useEffect(() => {
-    if (isWon && !isLoading && initialCells.some(c => c !== null)) {
-      const timer = setTimeout(() => {
-        handleNewLevel();
-      }, 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [isWon]);
 
   const handleResetLevel = () => {
     setExitingCellIds([]);
     setErrorCellId(null);
     setCells(initialCells);
+    setLives(3);
+    setIsGameOver(false);
   };
 
   const handleNewLevel = async () => {
     setExitingCellIds([]);
     setErrorCellId(null);
+    setLives(3);
+    setIsGameOver(false);
     const nextLvl = isWon ? levelNumber + 1 : levelNumber;
     if (isWon) {
       setLevelNumber(nextLvl);
@@ -78,7 +82,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
   };
 
   const handleCellClick = (row: number, col: number, direction: Direction) => {
-    if (isWon || isLoading) return;
+    if (isWon || isLoading || isGameOver) return;
 
     const clickedCell = cells.find(
       (cell) => cell !== null && cell.row === row && cell.col === col
@@ -103,10 +107,28 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
     } else {
       setStreak(0);
       setErrorCellId(clickedCell.id);
+
+      setLives((prevLives) => {
+        const newLives = prevLives - 1;
+        if (newLives <= 0) {
+          setIsGameOver(true);
+        }
+        return newLives;
+      });
       setTimeout(() => {
         setErrorCellId((current) => current === clickedCell.id ? null : current);
       }, 300);
     }
+  };
+
+  const handleGameOverChange = (open: boolean) => {
+    if (!open && isGameOver) handleResetLevel();
+  };
+
+  const isLevelWonModalOpen = isWon && !isLoading && initialCells.some(c => c !== null);
+
+  const handleLevelWonChange = (open: boolean) => {
+    if (!open && isWon) handleNewLevel();
   };
 
   return (
@@ -117,14 +139,14 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
 
         {/* Header & Status */}
         <div className="flex flex-col items-center md:items-start gap-2 w-full">
-          <GameHeader levelNumber={levelNumber} gridSize={gridSize} streak={streak} />
-          <StatusBanner isWon={isWon} isDeadlocked={isDeadlocked} levelNumber={levelNumber} />
+          <GameHeader levelNumber={levelNumber} gridSize={gridSize} streak={streak} lives={lives} isGameOver={isGameOver} />
         </div>
 
         {/* Action Controls */}
         <div className="w-full">
           <GameControls
             isWon={isWon}
+            isGameOver={isGameOver}
             onReset={handleResetLevel}
             onNewLevel={handleNewLevel}
           />
@@ -172,6 +194,48 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1 }) => {
           })}
         </div>
       </div>
+      {/* Game Over Modal */}
+      <Dialog open={isGameOver} onOpenChange={handleGameOverChange}>
+        <DialogContent className="sm:max-w-md text-center outline-none border-none">
+          <DialogHeader className="flex flex-col items-center">
+            <DialogTitle className="text-2xl font-black text-red-500 uppercase tracking-widest mt-2">Game Over! 💔</DialogTitle>
+            <DialogDescription className="text-center text-lg mt-2 font-medium">
+              You ran out of lives! But don&apos;t worry, you can try this puzzle again.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center mt-6">
+            <button
+              type="button"
+              onClick={handleResetLevel}
+              className="px-8 py-3 bg-red-500 text-white font-bold tracking-widest uppercase hover:bg-red-600 transition-colors rounded-xl"
+            >
+              Try Again
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Level Won Modal */}
+      <Dialog open={isLevelWonModalOpen} onOpenChange={handleLevelWonChange}>
+        <DialogContent className="sm:max-w-md text-center outline-none border-none">
+          <DialogHeader className="flex flex-col items-center">
+            <DialogTitle className="text-2xl font-black text-green-500 uppercase tracking-widest mt-2">Level Cleared! 🎉</DialogTitle>
+            <DialogDescription className="text-center text-lg mt-2 font-medium">
+              You successfully beat Level {levelNumber}.
+              {streak > 1 && <span className="block mt-2 font-bold text-orange-500">You are on a {streak} win streak! 🔥</span>}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center mt-6">
+            <button
+              type="button"
+              onClick={handleNewLevel}
+              className="px-8 py-3 bg-black text-white dark:bg-white dark:text-black font-bold tracking-widest uppercase hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors rounded-xl"
+            >
+              Next Level
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

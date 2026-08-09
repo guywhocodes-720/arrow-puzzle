@@ -14,11 +14,12 @@ export async function saveLevelProgress(newLevel: number, currentStreak: number)
 
     if (!user) return;
 
-    const { data: profile } = await supabase.from("profiles").select("highest_streak").eq("id", user.id).single();
+    const { data: profile } = await supabase.from("profiles").select("highest_streak, highest_level").eq("id", user.id).single();
 
     const bestStreak = Math.max(profile?.highest_streak || 0, currentStreak);
+    const bestLevel = Math.max(profile?.highest_level || 0, newLevel);
 
-    const { error } = await supabase.from("profiles").update({ highest_level: newLevel, highest_streak: bestStreak }).eq("id", user.id);
+    const { error } = await supabase.from("profiles").update({ highest_level: bestLevel, highest_streak: bestStreak }).eq("id", user.id);
 
     if (error) {
         console.error("Faild to save progress", error);

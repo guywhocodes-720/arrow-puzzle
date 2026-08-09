@@ -19,8 +19,8 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 type="button"
                 onClick={onReset}
                 className={`px-6 py-2 border text-xs font-semibold uppercase tracking-widest transition-colors cursor-pointer ${isGameOver
-                    ? 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white dark:hover:bg-red-500'
-                    : 'border-zinc-300 dark:border-zinc-700 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                    ? 'border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground'
+                    : 'border-input text-foreground hover:bg-secondary hover:text-secondary-foreground'
                     }`}
             >
                 {isGameOver ? "Try Again" : "Reset"}
@@ -29,7 +29,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
             <button
                 type="button"
                 onClick={onNewLevel}
-                className="px-6 py-2 border border-black dark:border-white text-xs font-semibold text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black uppercase tracking-widest transition-colors cursor-pointer"
+                className="px-6 py-2 border border-foreground text-xs font-semibold text-foreground hover:bg-foreground hover:text-background uppercase tracking-widest transition-colors cursor-pointer"
             >
                 {isWon ? "Next Level" : "Random Puzzle"}
             </button>

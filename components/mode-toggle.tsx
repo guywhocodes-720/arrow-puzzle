@@ -27,7 +27,7 @@ export function ModeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 animate-pulse" />
+      <div className="w-9 h-9 rounded-lg border border-input bg-muted animate-pulse" />
     );
   }
 
@@ -36,13 +36,13 @@ export function ModeToggle() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-9 h-9 flex items-center justify-center rounded-lg bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer active:scale-95 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        className="w-9 h-9 flex items-center justify-center rounded-lg bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer active:scale-95 focus:outline-none focus:ring-1 focus:ring-ring"
         aria-label="Toggle theme"
         title="Toggle Theme"
       >
         {/* Sun Icon (Light Mode) */}
         <svg
-          className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-zinc-900 dark:text-zinc-100"
+          className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -64,7 +64,7 @@ export function ModeToggle() {
 
         {/* Moon Icon (Dark Mode) */}
         <svg
-          className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-zinc-900 dark:text-zinc-100"
+          className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -79,7 +79,7 @@ export function ModeToggle() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-36 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl py-1 z-50">
+        <div className="absolute right-0 mt-2 w-36 rounded-lg bg-popover border border-border shadow-xl py-1 z-50">
           <button
             type="button"
             onClick={() => {
@@ -88,8 +88,8 @@ export function ModeToggle() {
             }}
             className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium cursor-pointer transition-colors ${
               theme === "light"
-                ? "bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white font-bold"
-                : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                ? "bg-accent text-accent-foreground font-bold"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             <svg
@@ -123,8 +123,8 @@ export function ModeToggle() {
             }}
             className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium cursor-pointer transition-colors ${
               theme === "dark"
-                ? "bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white font-bold"
-                : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                ? "bg-accent text-accent-foreground font-bold"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             <svg
@@ -150,8 +150,8 @@ export function ModeToggle() {
             }}
             className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium cursor-pointer transition-colors ${
               theme === "system"
-                ? "bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white font-bold"
-                : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                ? "bg-accent text-accent-foreground font-bold"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             <svg

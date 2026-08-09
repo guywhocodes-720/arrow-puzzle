@@ -12,7 +12,7 @@ interface GameHeaderProps {
 export const GameHeader: React.FC<GameHeaderProps> = ({ levelNumber, streak, lives = 3 }) => {
   return (
     <div className="flex items-center justify-center md:justify-start w-full gap-4 sm:gap-6">
-      <span className="font-semibold text-lg sm:text-xl tracking-widest uppercase text-black dark:text-white">
+      <span className="font-semibold text-lg sm:text-xl tracking-widest uppercase text-foreground">
         Level {levelNumber}
       </span>
 
@@ -20,13 +20,13 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ levelNumber, streak, liv
         {[...Array(3)].map((_, i) => (
           <Heart
             key={i}
-            className={"w-5 h-5 transition-all duration-300 " + (i < lives ? "fill-red-500 text-red-500 scale-100" : "fill-transparent text-zinc-300 dark:text-zinc-700 scale-90")}
+            className={"w-5 h-5 transition-all duration-300 " + (i < lives ? "fill-destructive text-destructive scale-100" : "fill-transparent text-muted scale-90")}
           />
         ))}
       </div>
 
       {streak > 0 && (
-        <span className='text-sm font-bold text-orange-500 uppercase tracking-widest'>
+        <span className='text-sm font-bold text-primary uppercase tracking-widest'>
           🔥 {streak} Streak
         </span>
       )}

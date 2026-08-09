@@ -37,14 +37,14 @@ export const Cell: React.FC<CellProps> = ({ data, row, col, isExiting, isError, 
 
     let animationClass = isExiting ? `${ANIMATION_CLASSES[data.direction]} pointer-events-none z-50` : '';
     if (isError) {
-        animationClass = 'animate-error-shake text-red-500 dark:text-red-500';
+        animationClass = 'animate-error-shake text-destructive';
     }
 
     return (
         <button
             type="button"
             onClick={() => onClick(row, col, data.direction)}
-            className={`w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl sm:text-5xl font-black text-black dark:text-white active:opacity-70 active:scale-95 transition-all cursor-pointer select-none focus:outline-none touch-manipulation ${animationClass}`}
+            className={`w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl sm:text-5xl font-black text-foreground active:opacity-70 active:scale-95 transition-all cursor-pointer select-none focus:outline-none touch-manipulation ${animationClass}`}
             aria-label={`Cell at row ${row}, col ${col} pointing ${data.direction}`}
         >
             {ARROW_SYMBOLS[data.direction]}

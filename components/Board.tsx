@@ -78,11 +78,14 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
     setErrorCellId(null);
     setLives(3);
     setIsGameOver(false);
-    const nextLvl = levelNumber + 1;
-    setLevelNumber(nextLvl);
+
+    const targetLvl = isWon ? levelNumber + 1 : levelNumber;
+    if (isWon) {
+      setLevelNumber(targetLvl);
+    }
 
     setIsLoading(true);
-    generateProceduralLevelAsync(nextLvl).then((newLevel) => {
+    generateProceduralLevelAsync(targetLvl).then((newLevel) => {
       setInitialCells(newLevel);
       setCells(newLevel);
       setIsLoading(false);

@@ -12,6 +12,11 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Arrow Escape | Directional Logic Puzzle",
   description: "A minimalist directional logic puzzle game built with Next.js",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Arrow Escape",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Flame, Star } from "lucide-react";
 import { logout } from "@/app/login/action";
 import { EditNameDialog } from "@/components/Profile/EditNameDialog";
+import { InstallButton } from "@/components/InstallButton";
 
 export default async function ProfilePage() {
     const cookieStore = await cookies();
@@ -87,6 +88,20 @@ export default async function ProfilePage() {
                             <Flame className="w-8 h-8 text-primary ml-1 mt-2" />
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mt-16 pt-8 border-t border-border">
+                <div className="flex flex-col max-w-md">
+                    <h2 className="text-lg font-medium tracking-widest uppercase text-foreground mb-2">
+                        Install Arrow Escape
+                    </h2>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                        Add the game to your home screen for full-screen play and instant offline access without opening your browser.
+                    </p>
+                </div>
+                <div className="shrink-0">
+                    <InstallButton />
                 </div>
             </div>
         </div>

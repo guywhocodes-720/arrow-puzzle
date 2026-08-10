@@ -149,6 +149,67 @@ export const isDirectionDistributionBalanced = (board: BoardState): boolean => {
     );
 };
 
+/**
+ * Rejects boards with 3+ consecutive same-direction arrows in any row or column.
+ * Eliminates visible clusters without affecting the random generator.
+ */
+const hasNoStreaks = (board: BoardState, gridSize: number): boolean => {
+    // Check rows
+    for (let r = 0; r < gridSize; r++) {
+        let streak = 1;
+        for (let c = 1; c < gridSize; c++) {
+            const prev = board[r * gridSize + c - 1];
+            const curr = board[r * gridSize + c];
+            if (prev && curr && prev.direction === curr.direction) {
+                streak++;
+                if (streak >= 3) return false;
+            } else {
+                streak = 1;
+            }
+        }
+    }
+    // Check columns
+    for (let c = 0; c < gridSize; c++) {
+        let streak = 1;
+        for (let r = 1; r < gridSize; r++) {
+            const prev = board[(r - 1) * gridSize + c];
+            const curr = board[r * gridSize + c];
+            if (prev && curr && prev.direction === curr.direction) {
+                streak++;
+                if (streak >= 3) return false;
+            } else {
+                streak = 1;
+            }
+        }
+    }
+    return true;
+};
+
+/**
+ * Rejects boards where more than half the cells in any single row or column share one direction.
+ * Catches the "entire top row is mostly ← arrows" pattern.
+ */
+const hasNoRowDominance = (board: BoardState, gridSize: number): boolean => {
+    const maxAllowed = Math.floor(gridSize / 2);
+    const dirs: Direction[] = ['up', 'right', 'down', 'left'];
+    for (let r = 0; r < gridSize; r++) {
+        const counts: Record<Direction, number> = { up: 0, right: 0, down: 0, left: 0 };
+        for (let c = 0; c < gridSize; c++) {
+            const cell = board[r * gridSize + c];
+            if (cell) counts[cell.direction]++;
+        }
+        for (const d of dirs) { if (counts[d] > maxAllowed) return false; }
+    }
+    for (let c = 0; c < gridSize; c++) {
+        const counts: Record<Direction, number> = { up: 0, right: 0, down: 0, left: 0 };
+        for (let r = 0; r < gridSize; r++) {
+            const cell = board[r * gridSize + c];
+            if (cell) counts[cell.direction]++;
+        }
+        for (const d of dirs) { if (counts[d] > maxAllowed) return false; }
+    }
+    return true;
+};
 
 /**
  * Procedural Candidate Generator with Direction Balancing & Anti-Clustering.
@@ -159,7 +220,6 @@ const generateCandidateBoard = (gridSize: number = 5): BoardState | null => {
     const totalCells = gridSize * gridSize;
     const board: BoardState = new Array(totalCells).fill(null);
     const directions: Direction[] = ['up', 'right', 'down', 'left'];
-    const dirCounts: Record<Direction, number> = { up: 0, right: 0, down: 0, left: 0 };
 
     const indices = Array.from({ length: totalCells }, (_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
@@ -171,30 +231,7 @@ const generateCandidateBoard = (gridSize: number = 5): BoardState | null => {
         const row = Math.floor(idx / gridSize);
         const col = idx % gridSize;
 
-        const leftCell = col > 0 ? board[row * gridSize + (col - 1)] : null;
-        const topCell = row > 0 ? board[(row - 1) * gridSize + col] : null;
-        const rightCell = col < gridSize - 1 ? board[row * gridSize + (col + 1)] : null;
-        const bottomCell = row < gridSize - 1 ? board[(row + 1) * gridSize + col] : null;
-
-        const neighborDirs = [leftCell, topCell, rightCell, bottomCell]
-            .filter((c) => c !== null)
-            .map((c) => c!.direction);
-
-        const sortedDirs = [...directions].sort((a, b) => {
-            if (dirCounts[a] !== dirCounts[b]) {
-                return dirCounts[a] - dirCounts[b];
-            }
-            return Math.random() - 0.5;
-        });
-
-        const candidateDirs = sortedDirs.filter((dir) => !neighborDirs.includes(dir));
-
-        // STRICT ANTI-CLUSTERING: If we are forced to match a neighbor, abort and retry!
-        if (candidateDirs.length === 0) {
-            return null;
-        }
-
-        const dirToPlace = candidateDirs[0];
+        const dirToPlace = directions[Math.floor(Math.random() * directions.length)];
 
         board[idx] = {
             id: `cell-${row}-${col}`,
@@ -202,7 +239,6 @@ const generateCandidateBoard = (gridSize: number = 5): BoardState | null => {
             col,
             direction: dirToPlace,
         };
-        dirCounts[dirToPlace]++;
     }
 
     return board;
@@ -306,18 +342,23 @@ export const generateProceduralLevel = (levelNumber: number = 1): BoardState => 
 
         if (
             isDirectionDistributionBalanced(board) &&
+            hasNoStreaks(board, gridSize) &&
+            hasNoRowDominance(board, gridSize) &&
             countTurnOneFreeMoves(board, gridSize) <= 3
         ) {
             return board;
         }
     }
 
+    // Fallback: relax turn-one and balance, but never allow streaks or row dominance
     while (true) {
         let board = generateCandidateBoard(gridSize);
         if (!board) continue;
 
         board = makeBoardSolvable(board, gridSize);
-        if (board) return board;
+        if (!board) continue;
+
+        if (hasNoStreaks(board, gridSize) && hasNoRowDominance(board, gridSize)) return board;
     }
 };
 
@@ -353,12 +394,14 @@ export const generateProceduralLevelAsync = (levelNumber: number = 1): Promise<B
                 if (attempts <= 200) {
                     if (
                         isDirectionDistributionBalanced(board) &&
+                        hasNoStreaks(board, gridSize) &&
+                        hasNoRowDominance(board, gridSize) &&
                         countTurnOneFreeMoves(board, gridSize) <= 3
                     ) {
                         resolve(board);
                         return;
                     }
-                } else {
+                } else if (hasNoStreaks(board, gridSize) && hasNoRowDominance(board, gridSize)) {
                     resolve(board);
                     return;
                 }

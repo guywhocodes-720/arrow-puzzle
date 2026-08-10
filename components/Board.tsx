@@ -6,7 +6,6 @@ import {
   BoardState,
   Direction,
   createSolvableLevel,
-  generateProceduralLevelAsync,
   getGridSizeForLevel,
   hasValidMoves,
   isPathClear
@@ -42,15 +41,27 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
   const [lives, setLives] = useState<number>(3);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isLevelWonModalOpen, setIsLevelWonModalOpen] = useState<boolean>(false);
+  const [noLevelFound, setNoLevelFound] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(true);
-    generateProceduralLevelAsync(initialLevel).then((randomLevel) => {
-      setInitialCells(randomLevel);
-      setCells(randomLevel);
-      setIsLoading(false);
-    });
-  }, [initialLevel]);
+    setNoLevelFound(false);
+    fetch(`/api/levels/${levelNumber}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.board) {
+          setInitialCells(data.board);
+          setCells(data.board);
+        } else {
+          setNoLevelFound(true);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching level:", err);
+        setNoLevelFound(true);
+      })
+      .finally(() => setIsLoading(false));
+  }, [levelNumber]);
 
   const isWon = cells.every((cell) => cell === null);
 
@@ -82,14 +93,10 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
     const targetLvl = isWon ? levelNumber + 1 : levelNumber;
     if (isWon) {
       setLevelNumber(targetLvl);
+    } else {
+      // If we aren't advancing levels, just reset the current level
+      setCells(initialCells);
     }
-
-    setIsLoading(true);
-    generateProceduralLevelAsync(targetLvl).then((newLevel) => {
-      setInitialCells(newLevel);
-      setCells(newLevel);
-      setIsLoading(false);
-    });
   };
 
   const handleCellClick = (row: number, col: number, direction: Direction) => {
@@ -183,18 +190,31 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
           }}
         >
           {/* Loading Overlay */}
-          {isLoading && (
+          {isLoading && !noLevelFound && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 rounded-2xl backdrop-blur-sm">
               <div className="flex flex-col items-center gap-3">
                 <div className="w-8 h-8 border-3 border-muted border-t-primary rounded-full animate-spin" />
                 <span className="text-sm font-medium text-muted-foreground">
-                  Generating Level {levelNumber}...
+                  Loading Level {levelNumber}...
                 </span>
               </div>
             </div>
           )}
 
-          {cells.map((cell, index) => {
+          {/* No Level Found Message */}
+          {noLevelFound && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-background rounded-2xl">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <div className="text-4xl">📭</div>
+                <h3 className="text-2xl font-bold text-primary">No level found.</h3>
+                <p className="text-muted-foreground max-w-[250px]">
+                  It looks like level havn't generated yet. Check back later!
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!noLevelFound && cells.map((cell, index) => {
             const row = Math.floor(index / gridSize);
             const col = index % gridSize;
             const isExiting = cell !== null && exitingCellIds.includes(cell.id);

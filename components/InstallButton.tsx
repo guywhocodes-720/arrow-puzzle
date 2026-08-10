@@ -35,7 +35,7 @@ export function InstallButton() {
     setDeferredPrompt(null);
   };
 
-  if (!isInstallable) return null;
+  // if (!isInstallable) return null;
 
   return (
     <button

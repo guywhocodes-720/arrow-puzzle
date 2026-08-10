@@ -8,10 +8,17 @@ export function InstallButton() {
   const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
+    // Check if the event was already caught by our layout script
+    if (typeof window !== "undefined" && (window as any).deferredPrompt) {
+      setDeferredPrompt((window as any).deferredPrompt);
+      setIsInstallable(true);
+    }
+
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
       setIsInstallable(true);
+      (window as any).deferredPrompt = e;
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
@@ -35,7 +42,7 @@ export function InstallButton() {
     setDeferredPrompt(null);
   };
 
-  // if (!isInstallable) return null;
+  if (!isInstallable) return null;
 
   return (
     <button

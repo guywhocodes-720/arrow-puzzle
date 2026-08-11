@@ -24,3 +24,19 @@ export async function updateDisplayName(formData: FormData) {
         revalidatePath("/", "layout");
     }
 }
+
+export async function updateAudioSettings(isMuted: boolean, volumeMultiplier: number) {
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+        await supabase
+            .from("profiles")
+            .update({ 
+                is_muted: isMuted, 
+                volume_multiplier: volumeMultiplier 
+            })
+            .eq("id", user.id);
+    }
+}

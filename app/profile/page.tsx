@@ -5,6 +5,8 @@ import { Flame, Star } from "lucide-react";
 import { logout } from "@/app/login/action";
 import { EditNameDialog } from "@/components/Profile/EditNameDialog";
 import { InstallButton } from "@/components/InstallButton";
+import { AudioSettings } from "@/components/Profile/AudioSettings";
+import { AudioProvider } from "@/components/AudioProvider";
 
 export default async function ProfilePage() {
     const cookieStore = await cookies();
@@ -18,7 +20,7 @@ export default async function ProfilePage() {
 
     const { data: profile } = await supabase
         .from("profiles")
-        .select("highest_level, highest_streak")
+        .select("highest_level, highest_streak, is_muted, volume_multiplier")
         .eq("id", user.id)
         .single();
 
@@ -27,9 +29,12 @@ export default async function ProfilePage() {
 
     const highestLevel = profile?.highest_level || 1;
     const highestStreak = profile?.highest_streak || 0;
+    const initialMuted = profile?.is_muted ?? false;
+    const initialVolume = profile?.volume_multiplier ?? 1.0;
 
     return (
-        <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 py-12">
+        <AudioProvider initialMuted={initialMuted} initialVolume={initialVolume}>
+            <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 py-12">
 
             {/* Elegant Header Section */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border pb-6 mb-8">
@@ -48,7 +53,7 @@ export default async function ProfilePage() {
                     </p>
                 </div>
 
-                <div className="sm:ml-auto mt-4 sm:mt-0 flex">
+                <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center">
                     <form action={logout}>
                         <button
                             type="submit"
@@ -91,6 +96,9 @@ export default async function ProfilePage() {
                 </div>
             </div>
 
+            {/* Dedicated Audio Settings Section */}
+            <AudioSettings />
+
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mt-16 pt-8 border-t border-border">
                 <div className="flex flex-col max-w-md">
                     <h2 className="text-lg font-medium tracking-widest uppercase text-foreground mb-2">
@@ -105,5 +113,6 @@ export default async function ProfilePage() {
                 </div>
             </div>
         </div>
+        </AudioProvider>
     );
 }

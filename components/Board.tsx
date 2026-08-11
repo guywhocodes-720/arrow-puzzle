@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { saveLevelProgress } from "@/app/play/action";
+import { useSound } from "@/hooks/useSound";
 
 interface BoardProps {
   initialLevel?: number;
@@ -28,6 +29,7 @@ interface BoardProps {
 }
 
 export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 0 }) => {
+  const { playTap, playSlide, playWin } = useSound();
   const [levelNumber, setLevelNumber] = useState<number>(initialLevel);
   const gridSize = getGridSizeForLevel(levelNumber);
 
@@ -67,9 +69,10 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
 
   useEffect(() => {
     if (isWon && !isLoading && initialCells.some(c => c !== null)) {
+      playWin();
       setIsLevelWonModalOpen(true);
     }
-  }, [isWon, isLoading, initialCells]);
+  }, [isWon, isLoading, initialCells, playWin]);
 
 
 
@@ -111,6 +114,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
     const activeCells = cells.map(c => (c !== null && exitingCellIds.includes(c.id)) ? null : c);
 
     if (isPathClear(activeCells, row, col, direction, gridSize)) {
+      playSlide();
       const nextStreak = streakRef.current + 1;
       streakRef.current = nextStreak;
       setStreak(nextStreak);
@@ -137,6 +141,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
         setExitingCellIds((prev) => prev.filter(id => id !== clickedCell.id));
       }, 800);
     } else {
+      playTap();
       // Wrong click: immediately break the streak
       setStreak(0);
       streakRef.current = 0;

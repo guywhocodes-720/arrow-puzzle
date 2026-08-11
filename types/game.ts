@@ -245,9 +245,8 @@ const generateReversePoolBoard = (gridSize: number): BoardState => {
         if (step === totalCells) return true;
         if (backtracks > 10000) return false;
 
-        let bestIdx = -1;
+        let candidates: { idx: number, dirs: Direction[] }[] = [];
         let minValidCount = 5;
-        let bestDirs: Direction[] = [];
 
         for (let idx = 0; idx < totalCells; idx++) {
             if (board[idx] !== null) continue;
@@ -273,13 +272,18 @@ const generateReversePoolBoard = (gridSize: number): BoardState => {
 
             if (validDirs.length < minValidCount) {
                 minValidCount = validDirs.length;
-                bestIdx = idx;
-                bestDirs = validDirs;
-                if (minValidCount === 1) break;
+                candidates = [{ idx, dirs: validDirs }];
+            } else if (validDirs.length === minValidCount) {
+                candidates.push({ idx, dirs: validDirs });
             }
         }
 
-        if (bestIdx === -1) return false;
+        if (candidates.length === 0) return false;
+
+        // Randomly pick one of the best candidates to break top-left bias
+        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        const bestIdx = chosen.idx;
+        const bestDirs = chosen.dirs;
 
         // Balance direction distribution and heavily penalize 2-streaks
         bestDirs.sort((a, b) => {
@@ -289,11 +293,11 @@ const generateReversePoolBoard = (gridSize: number): BoardState => {
             // Primary weight: Avoid 2-streaks
             if (aStreak !== bStreak) return aStreak - bStreak;
             
-            // Secondary weight: Balance direction counts globally
+            // Secondary weight: Balance direction counts globally (only if significantly unbalanced)
             const countDiff = dirCounts[a] - dirCounts[b];
-            if (countDiff !== 0) return countDiff;
+            if (Math.abs(countDiff) > 2) return countDiff;
             
-            // Tertiary weight: Random tie-breaker
+            // Tertiary weight: Random tie-breaker for organic variety
             return Math.random() - 0.5;
         });
         

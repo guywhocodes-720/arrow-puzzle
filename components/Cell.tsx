@@ -27,9 +27,7 @@ const ANIMATION_CLASSES: Record<Direction, string> = {
 };
 
 // SVG: viewBox 0 0 100 100, arrow points right.
-// Thin shaft from x=8 to x=62, centered at y=50, height=6px.
-// Arrowhead: triangle from x=60 to x=92, spreading from y=50 to ±22.
-const ArrowSVG = ({ rotate, color }: { rotate: string; color: string }) => (
+const ArrowSVG = ({ rotate, color, className }: { rotate: string; color: string; className?: string }) => (
     <svg
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
@@ -37,6 +35,7 @@ const ArrowSVG = ({ rotate, color }: { rotate: string; color: string }) => (
         height="100%"
         style={{ transform: rotate, display: 'block' }}
         aria-hidden="true"
+        className={className}
     >
         {/* Long thin shaft */}
         <rect x="8" y="46" width="54" height="8" rx="4" fill={color} />
@@ -51,10 +50,12 @@ export const Cell: React.FC<CellProps> = ({ data, row, col, isExiting, isError, 
     }
 
     let color = 'currentColor';
-    let wrapperClass = 'text-foreground hover:text-primary';
+    let wrapperClass = 'text-slate-200 hover:text-white';
+    let arrowClass = '';
 
     if (isExiting) {
-        wrapperClass = `${ANIMATION_CLASSES[data.direction]} pointer-events-none z-50`;
+        wrapperClass = 'pointer-events-none z-50';
+        arrowClass = ANIMATION_CLASSES[data.direction];
         color = 'var(--color-primary, oklch(0.7 0.15 190))';
     }
     if (isError) {
@@ -66,10 +67,12 @@ export const Cell: React.FC<CellProps> = ({ data, row, col, isExiting, isError, 
         <button
             type="button"
             onClick={() => onClick(row, col, data.direction)}
-            className={`w-full h-full aspect-square flex items-center justify-center p-[15%] active:scale-90 cursor-pointer select-none focus:outline-none touch-manipulation transition-[transform,opacity] duration-75 ${wrapperClass}`}
+            className={`w-full h-full aspect-square flex items-center justify-center p-[8%] active:scale-95 cursor-pointer select-none focus:outline-none touch-manipulation transition-all duration-200 ${wrapperClass}`}
             aria-label={`Cell at row ${row}, col ${col} pointing ${data.direction}`}
         >
-            <ArrowSVG rotate={DIRECTION_ROTATE[data.direction]} color={color} />
+            <div className={`w-full h-full ${arrowClass}`}>
+                <ArrowSVG rotate={DIRECTION_ROTATE[data.direction]} color={color} />
+            </div>
         </button>
     );
 };

@@ -36,7 +36,7 @@ export default async function PlayPage() {
 
   return (
     <AudioProvider initialMuted={initialMuted} initialVolume={initialVolume}>
-      <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 w-full mx-auto overflow-hidden relative min-h-[calc(100vh-3.5rem)]">
+      <main className="flex-1 flex flex-col items-center justify-center w-full mx-auto relative p-4 min-h-[calc(100vh-100px)]">
         <Board initialLevel={initialLevel} initialStreak={initialStreak} />
       </main>
     </AudioProvider>

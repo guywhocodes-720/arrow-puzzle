@@ -152,7 +152,7 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
         if (newLives <= 0) {
           setIsGameOver(true);
           if (!isGameOver) {
-             saveLevelLoss();
+            saveLevelLoss();
           }
         }
         return newLives;
@@ -166,18 +166,18 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
 
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row items-center justify-between w-full max-w-5xl gap-8 mt-2 md:mt-8">
+    <div className="flex-1 flex flex-col lg:flex-row items-center justify-center w-full max-w-[1200px] mx-auto gap-8 sm:gap-10 lg:gap-16">
 
-      {/* Information & Controls (Top on Mobile, Left on Desktop) */}
-      <div className="flex flex-col items-center md:items-start justify-center gap-6 w-full md:w-auto shrink-0">
+      {/* Information & Controls (HUD) */}
+      <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#121820] border border-border/30 shadow-2xl rounded-2xl lg:rounded-[32px] w-full lg:w-[320px] shrink-0">
 
         {/* Header & Status */}
-        <div className="flex flex-col items-center md:items-start gap-2 w-full">
+        <div className="w-full">
           <GameHeader levelNumber={levelNumber} gridSize={gridSize} streak={streak} lives={lives} isGameOver={isGameOver} />
         </div>
 
-        {/* Action Controls */}
-        <div className="w-full">
+        {/* Action Controls (Desktop Only inside HUD) */}
+        <div className="w-full hidden lg:block">
           <GameControls
             isWon={isWon}
             isGameOver={isGameOver}
@@ -188,60 +188,73 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
 
       </div>
 
-      {/* The Board (Middle on Mobile, Right on Desktop) */}
-      <div className="flex-1 flex items-center md:justify-end justify-center w-full mt-auto mb-auto px-2">
-        <div
-          className="grid gap-1 sm:gap-2 relative w-full max-w-[92vw] sm:max-w-[75vw] md:max-w-[480px] aspect-square"
-          style={{
-            gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
-          }}
-        >
-          {/* Loading Overlay */}
-          {isLoading && !noLevelFound && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 rounded-2xl backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-8 h-8 border-3 border-muted border-t-primary rounded-full animate-spin" />
-                <span className="text-sm font-medium text-muted-foreground">
-                  Loading Level {levelNumber}...
-                </span>
+      {/* The Board */}
+      <div className="flex flex-col items-center justify-center w-full min-h-0">
+        <div className="p-2 sm:p-4 rounded-2xl sm:rounded-3xl bg-[#0d1319] border border-border/30 shadow-2xl">
+          <div
+            className="grid gap-1 sm:gap-1.5 md:gap-2 relative aspect-square w-[min(94vw,calc(100vh-270px))] sm:w-[min(80vw,calc(100vh-320px))] lg:w-[min(65vw,calc(100vh-160px),800px)]"
+            style={{
+              gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
+            }}
+          >
+            {/* Loading Overlay */}
+            {isLoading && !noLevelFound && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 rounded-2xl backdrop-blur-sm">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-8 h-8 border-3 border-muted border-t-primary rounded-full animate-spin" />
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Loading Level {levelNumber}...
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* No Level Found Message */}
-          {noLevelFound && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-background rounded-2xl">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="text-4xl">📭</div>
-                <h3 className="text-2xl font-bold text-primary">No level found.</h3>
-                <p className="text-muted-foreground max-w-[250px]">
-                  It looks like level havn't generated yet. Check back later!
-                </p>
+            {/* No Level Found Message */}
+            {noLevelFound && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-background rounded-2xl">
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="text-4xl">📭</div>
+                  <h3 className="text-2xl font-bold text-primary">No level found.</h3>
+                  <p className="text-muted-foreground max-w-[250px]">
+                    It looks like level havn't generated yet. Check back later!
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {!noLevelFound && cells.map((cell, index) => {
-            const row = Math.floor(index / gridSize);
-            const col = index % gridSize;
-            const isExiting = cell !== null && exitingCellIds.includes(cell.id);
-            const isError = cell !== null && cell.id === errorCellId;
+            {!noLevelFound && cells.map((cell, index) => {
+              const row = Math.floor(index / gridSize);
+              const col = index % gridSize;
+              const isExiting = cell !== null && exitingCellIds.includes(cell.id);
+              const isError = cell !== null && cell.id === errorCellId;
 
-            return (
-              <Cell
-                key={cell ? cell.id : `empty-${row}-${col}`}
-                data={cell}
-                row={row}
-                col={col}
-                isExiting={isExiting}
-                isError={isError}
-                onClick={handleCellClick}
-              />
-            );
-          })}
+              return (
+                <Cell
+                  key={cell ? cell.id : `empty-${row}-${col}`}
+                  data={cell}
+                  row={row}
+                  col={col}
+                  isExiting={isExiting}
+                  isError={isError}
+                  onClick={handleCellClick}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Action Controls (Mobile Only below Board) */}
+        <div className="w-full max-w-[400px] mt-8 sm:mt-10 lg:hidden">
+          <GameControls
+            isWon={isWon}
+            isGameOver={isGameOver}
+            onReset={handleResetLevel}
+            onNewLevel={handleNewLevel}
+          />
         </div>
       </div>
+
       {/* Game Over Modal - not dismissible by backdrop click */}
       <Dialog open={isGameOver} onOpenChange={() => { }}>
         <DialogContent className="sm:max-w-md text-center outline-none border-none" showCloseButton={false}>

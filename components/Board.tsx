@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { saveLevelProgress } from "@/app/play/action";
+import { saveLevelProgress, saveLevelLoss } from "@/app/play/action";
 import { useSound } from "@/hooks/useSound";
 
 interface BoardProps {
@@ -151,6 +151,9 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
         const newLives = prevLives - 1;
         if (newLives <= 0) {
           setIsGameOver(true);
+          if (!isGameOver) {
+             saveLevelLoss();
+          }
         }
         return newLives;
       });

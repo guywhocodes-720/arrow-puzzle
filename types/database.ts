@@ -39,6 +39,7 @@ export interface Database {
         Row: {
           user_id: string
           puzzles_solved: number
+          games_played: number
           win_rate: number
           current_streak: number
           highest_streak: number
@@ -47,6 +48,7 @@ export interface Database {
         Insert: {
           user_id: string
           puzzles_solved?: number
+          games_played?: number
           win_rate?: number
           current_streak?: number
           highest_streak?: number
@@ -55,6 +57,7 @@ export interface Database {
         Update: {
           user_id?: string
           puzzles_solved?: number
+          games_played?: number
           win_rate?: number
           current_streak?: number
           highest_streak?: number

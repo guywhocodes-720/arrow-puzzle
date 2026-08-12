@@ -30,11 +30,74 @@ export async function saveLevelProgress(newLevel: number, currentStreak: number)
             }, { onConflict: "id" });
 
             if (error) {
-                console.error("Failed to save progress:", error);
+                console.error("Failed to save progress to profiles:", error);
+            }
+
+            const { data: stats } = await supabase
+                .from("game_stats")
+                .select("*")
+                .eq("user_id", user.id)
+                .single();
+
+            const newPuzzlesSolved = (stats?.puzzles_solved || 0) + 1;
+            const newGamesPlayed = (stats?.games_played || 0) + 1;
+            const newWinRate = Math.round((newPuzzlesSolved / newGamesPlayed) * 100);
+
+            const { error: statsError } = await supabase.from("game_stats").upsert({
+                user_id: user.id,
+                puzzles_solved: newPuzzlesSolved,
+                games_played: newGamesPlayed,
+                win_rate: newWinRate,
+                current_streak: currentStreak,
+                highest_streak: bestStreak,
+                updated_at: new Date().toISOString(),
+            }, { onConflict: "user_id" });
+
+            if (statsError) {
+                console.error("Failed to save progress to game_stats:", statsError);
             }
         }
         revalidatePath("/leaderboard");
     } catch (err) {
         console.error("Error in saveLevelProgress action:", err);
+    }
+}
+
+export async function saveLevelLoss() {
+    try {
+        const cookieStore = await cookies();
+        cookieStore.set('guest_streak', '0', { maxAge: 60 * 60 * 24 * 30 });
+
+        const supabase = createClient(cookieStore);
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            const { data: stats } = await supabase
+                .from("game_stats")
+                .select("*")
+                .eq("user_id", user.id)
+                .single();
+
+            const currentSolved = stats?.puzzles_solved || 0;
+            const newGamesPlayed = (stats?.games_played || 0) + 1;
+            const newWinRate = Math.round((currentSolved / newGamesPlayed) * 100);
+
+            const { error: statsError } = await supabase.from("game_stats").upsert({
+                user_id: user.id,
+                puzzles_solved: currentSolved,
+                games_played: newGamesPlayed,
+                win_rate: newWinRate,
+                current_streak: 0,
+                highest_streak: stats?.highest_streak || 0,
+                updated_at: new Date().toISOString(),
+            }, { onConflict: "user_id" });
+
+            if (statsError) {
+                console.error("Failed to save loss to game_stats:", statsError);
+            }
+        }
+        revalidatePath("/leaderboard");
+    } catch (err) {
+        console.error("Error in saveLevelLoss action:", err);
     }
 }

@@ -50,6 +50,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="flex-1 flex flex-col w-full">
             {children}
           </div>
+          {/* Footer */}
+          <footer className="w-full py-12 border-t border-border/40 mt-auto">
+            <div className="max-w-6xl mx-auto px-6 sm:px-12 flex flex-col sm:flex-row items-center justify-between text-muted-foreground gap-4">
+              <div className="flex items-center gap-3 font-bold tracking-widest uppercase text-sm">
+                <img src="/android/launchericon-192x192.png" alt="Icon" className="w-6 h-6 rounded-md opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" />
+                <span>Arrow Escape</span>
+              </div>
+              <p className="text-xs tracking-widest uppercase font-semibold">
+                &copy; {new Date().getFullYear()} Play Pure Logic.
+              </p>
+            </div>
+          </footer>
         </ThemeProvider>
       </body>
     </html>

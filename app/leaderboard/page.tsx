@@ -15,7 +15,8 @@ export default async function LeaderboardPage() {
         .limit(50);
 
     return (
-        <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 py-12">
+        <main className="flex-1 flex flex-col w-full">
+            <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto px-6 sm:px-12 py-16 sm:py-20">
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border pb-6 mb-8">
@@ -95,6 +96,7 @@ export default async function LeaderboardPage() {
                 )}
             </div>
         </div>
-    );
+    </main>
+  );
 }
 

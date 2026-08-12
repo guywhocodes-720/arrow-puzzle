@@ -33,15 +33,16 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
   if (pathname === "/") return null;
 
   return (
-    <nav className="w-full flex justify-center py-4 sm:py-6 px-4 sm:px-12 bg-transparent z-50 relative">
-      <div className="w-full max-w-5xl flex items-center justify-between">
+    <nav className="w-full flex justify-center py-6 sm:py-8 px-6 sm:px-12 bg-transparent z-50 relative">
+      <div className="w-full max-w-6xl flex items-center justify-between">
 
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold tracking-widest text-foreground hover:opacity-70 transition-opacity uppercase"
+          className="flex items-center gap-3 text-xl font-bold tracking-widest text-foreground hover:opacity-70 transition-opacity uppercase"
           onClick={() => setMenuOpen(false)}
         >
+          <img src="/android/launchericon-192x192.png" alt="Icon" className="w-8 h-8" />
           Arrow Escape
         </Link>
 
@@ -55,14 +56,12 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
           </Link>
           {isLoggedIn ? (
             <>
-              <Link href="/profile" className="text-xs font-semibold text-primary uppercase tracking-widest hover:brightness-110 transition-all">
-                {username}
+              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
+                Dashboard
               </Link>
-              <form action={logout}>
-                <button type="submit" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest cursor-pointer">
-                  Sign Out
-                </button>
-              </form>
+              <Link href="/profile" className="text-xs font-semibold text-primary uppercase tracking-widest hover:brightness-110 transition-all">
+                Profile
+              </Link>
             </>
           ) : (
             <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
@@ -163,21 +162,19 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
           {isLoggedIn ? (
             <>
               <Link
+                href="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all uppercase tracking-widest"
+              >
+                Dashboard
+              </Link>
+              <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-primary hover:brightness-110 hover:bg-primary/10 transition-all uppercase tracking-widest"
               >
-                {username}
+                Profile
               </Link>
-              <form action={logout}>
-                <button
-                  type="submit"
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all uppercase tracking-widest cursor-pointer"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign Out
-                </button>
-              </form>
             </>
           ) : (
             <Link

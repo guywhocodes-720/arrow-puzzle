@@ -39,7 +39,7 @@ export function ReviewsSection() {
   ];
 
   const renderCard = (text: string, i: number) => (
-    <div key={i} className="flex-shrink-0 flex items-center justify-center px-8 py-5 mx-3 bg-card/60 backdrop-blur-xl border border-border/60 rounded-2xl hover:border-primary/40 transition-colors shadow-sm cursor-default">
+    <div key={i} className="flex-shrink-0 flex items-center justify-center px-12 py-8 mx-6 bg-card/60 backdrop-blur-xl border border-border/60 rounded-2xl hover:border-primary/40 transition-colors shadow-sm cursor-default">
       <span className="text-foreground/90 font-medium text-lg tracking-wide">
         "{text}"
       </span>
@@ -50,7 +50,7 @@ export function ReviewsSection() {
     <section className="w-full py-32 flex flex-col items-start overflow-hidden">
       
       {/* Title block */}
-      <div className="w-full px-6 sm:px-12 mb-16 text-center flex flex-col items-center">
+      <div className="w-full px-6 sm:px-12 mb-20 text-center flex flex-col items-center">
         <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter uppercase text-foreground leading-[0.9] mb-6">
           What Players Say
         </h2>
@@ -59,8 +59,8 @@ export function ReviewsSection() {
         </p>
       </div>
 
-      {/* Denser grid, left aligned text in cards */}
-      <div className="w-full flex flex-col gap-6 [mask-image:_linear-gradient(to_right,transparent_0,_black_15%,_black_85%,transparent_100%)]">
+      {/* Spacious grid */}
+      <div className="w-full flex flex-col gap-12 [mask-image:_linear-gradient(to_right,transparent_0,_black_15%,_black_85%,transparent_100%)]">
         
         {/* Row 1 (Moving Left) */}
         <div className="w-full flex overflow-hidden">

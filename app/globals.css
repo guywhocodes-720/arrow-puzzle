@@ -62,6 +62,25 @@ body {
   animation: errorShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+/* Marquee animations for reviews */
+@keyframes marqueeLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marqueeRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee-left {
+  animation: marqueeLeft 40s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marqueeRight 40s linear infinite;
+}
+
 @theme inline {
   --font-heading: var(--font-outfit);
   --font-sans: var(--font-outfit);

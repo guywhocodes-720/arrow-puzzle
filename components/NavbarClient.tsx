@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { logout } from "@/app/login/action";
 
 interface NavbarClientProps {
@@ -12,6 +13,7 @@ interface NavbarClientProps {
 export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -27,6 +29,8 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
+
+  if (pathname === "/") return null;
 
   return (
     <nav className="w-full flex justify-center py-4 sm:py-6 px-4 sm:px-12 bg-transparent z-50 relative">

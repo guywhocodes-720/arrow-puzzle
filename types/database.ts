@@ -34,6 +34,7 @@ export interface Database {
           is_muted?: boolean
           volume_multiplier?: number
         }
+        Relationships: []
       }
       game_stats: {
         Row: {
@@ -63,6 +64,25 @@ export interface Database {
           highest_streak?: number
           updated_at?: string
         }
+        Relationships: []
+      }
+      levels: {
+        Row: {
+          level_number: number
+          board_data: Json
+          created_at: string
+        }
+        Insert: {
+          level_number: number
+          board_data: Json
+          created_at?: string
+        }
+        Update: {
+          level_number?: number
+          board_data?: Json
+          created_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

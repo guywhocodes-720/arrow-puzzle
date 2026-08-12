@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/app/login/action";
 
 interface NavbarClientProps {
   username: string | null;
@@ -30,10 +29,8 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
-  if (pathname === "/") return null;
-
   return (
-    <nav className="w-full flex justify-center py-6 sm:py-8 px-6 sm:px-12 bg-transparent z-50 relative">
+    <nav className={`w-full flex justify-center py-6 sm:py-8 px-6 sm:px-12 bg-transparent z-50 relative ${pathname === "/" ? "hidden" : ""}`}>
       <div className="w-full max-w-6xl flex items-center justify-between">
 
         {/* Logo */}

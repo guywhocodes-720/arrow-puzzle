@@ -16,7 +16,7 @@ export function AudioSettings() {
     };
 
     return (
-        <div className="flex flex-col gap-6 mt-16 pt-8 border-t border-border">
+        <div className="flex flex-col gap-6 mt-4">
             <h2 className="text-lg font-medium tracking-widest uppercase text-muted-foreground">
                 Sounds & Effects
             </h2>

@@ -66,7 +66,7 @@ export default async function ProfilePage() {
                 {/* Dedicated Audio Settings Section */}
                 <AudioSettings />
 
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mt-16 pt-8 border-t border-border">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mt-12 pt-6 border-t border-border">
                     <div className="flex flex-col max-w-md">
                         <h2 className="text-lg font-medium tracking-widest uppercase text-foreground mb-2">
                             Install Arrow Escape

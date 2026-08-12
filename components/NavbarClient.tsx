@@ -45,20 +45,40 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
 
         {/* Desktop links */}
         <div className="hidden sm:flex items-center gap-8">
-          <Link href="/play" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
+
+          <Link 
+            href="/play" 
+            className={`text-sm font-medium transition-colors uppercase tracking-widest ${pathname === "/play" ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"}`}
+          >
             Play
           </Link>
-          <Link href="/leaderboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
+
+          <Link
+            href="/leaderboard"
+            className={`text-sm font-medium transition-colors uppercase tracking-widest ${pathname === "/leaderboard" ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"
+              }`}
+          >
             Leaderboard
           </Link>
+
           {isLoggedIn ? (
             <>
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
+              <Link
+                href="/dashboard"
+                className={`text-sm font-medium transition-colors uppercase tracking-widest ${pathname === "/dashboard" ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
                 Dashboard
               </Link>
-              <Link href="/profile" className="text-xs font-semibold text-primary uppercase tracking-widest hover:brightness-110 transition-all">
+
+              <Link
+                href="/profile"
+                className={`text-sm font-medium transition-colors uppercase tracking-widest ${pathname === "/profile" ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
                 Profile
               </Link>
+
             </>
           ) : (
             <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
@@ -147,7 +167,10 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
               key={href}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all uppercase tracking-widest"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all uppercase tracking-widest ${pathname === href
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
             >
               {label}
             </Link>
@@ -161,14 +184,20 @@ export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
               <Link
                 href="/dashboard"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all uppercase tracking-widest"
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all uppercase tracking-widest ${pathname === "/dashboard" 
+                  ? "text-primary bg-primary/10" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
                 Dashboard
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-primary hover:brightness-110 hover:bg-primary/10 transition-all uppercase tracking-widest"
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all uppercase tracking-widest ${pathname === "/profile" 
+                  ? "text-primary bg-primary/10" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
                 Profile
               </Link>

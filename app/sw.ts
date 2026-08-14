@@ -10,7 +10,7 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
-const dynamicRevision = crypto.randomUUID();
+const dynamicRevision = Math.random().toString(36).substring(2);
 
 const serwist = new Serwist({
     precacheEntries: [

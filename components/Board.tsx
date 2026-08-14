@@ -8,9 +8,11 @@ import {
   createSolvableLevel,
   getGridSizeForLevel,
   hasValidMoves,
-  isPathClear
+  isPathClear,
+  generateProceduralLevelAsync
 } from "@/types/game";
 import { Cell } from "./Cell";
+import { dbHelpers } from "@/utils/indexedDB";
 import { GameHeader } from "./Board/GameHeader";
 import { GameControls } from "./Board/GameControls";
 import {
@@ -46,23 +48,53 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
   const [noLevelFound, setNoLevelFound] = useState<boolean>(false);
 
   useEffect(() => {
+    let isMounted = true;
     setIsLoading(true);
     setNoLevelFound(false);
-    fetch(`/api/levels/${levelNumber}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.board) {
-          setInitialCells(data.board);
-          setCells(data.board);
-        } else {
-          setNoLevelFound(true);
+
+    const loadLevel = async () => {
+      try {
+        const localLevel = await dbHelpers.getLevel(levelNumber);
+        if (localLevel && localLevel.boardData) {
+          if (isMounted) {
+            setInitialCells(localLevel.boardData);
+            setCells(localLevel.boardData);
+            setIsLoading(false);
+          }
+          return;
         }
-      })
-      .catch(err => {
-        console.error("Error fetching level:", err);
-        setNoLevelFound(true);
-      })
-      .finally(() => setIsLoading(false));
+
+        const res = await fetch(`/api/levels/${levelNumber}`);
+        const data = await res.json();
+
+        if (data.success && data.board) {
+          if (isMounted) {
+            setInitialCells(data.board);
+            setCells(data.board);
+          }
+        } else {
+          const generatedBoard = await generateProceduralLevelAsync(levelNumber);
+          if (isMounted) {
+            setInitialCells(generatedBoard);
+            setCells(generatedBoard);
+          }
+        }
+      } catch (err) {
+        const generatedBoard = await generateProceduralLevelAsync(levelNumber);
+        if (isMounted) {
+          setInitialCells(generatedBoard);
+          setCells(generatedBoard);
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    loadLevel();
+
+    return () => {
+      isMounted = false;
+    };
   }, [levelNumber]);
 
   const isWon = cells.every((cell) => cell === null);

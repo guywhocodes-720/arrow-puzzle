@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRightLeft, Menu, X } from "lucide-react";
+import { useSync } from "@/hooks/useSync";
 
 interface NavbarClientProps {
   username: string | null;
@@ -11,6 +12,7 @@ interface NavbarClientProps {
 }
 
 export function NavbarClient({ username, isLoggedIn }: NavbarClientProps) {
+  useSync();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();

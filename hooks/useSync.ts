@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { initDB } from "@/utils/indexedDB";
+import { saveLevelProgress } from "@/app/play/action";
 
 export const useSync = () => {
     const [isSyncing, setIsSyncing] = useState(false);
@@ -18,6 +19,20 @@ export const useSync = () => {
                 setIsSyncing(true);
                 const db = await initDB();
                 
+                const pendingSync = await db.get("meta", "pending_sync");
+                if (pendingSync === "true") {
+                    const offlineLevel = await db.get("meta", "offline_level");
+                    const offlineStreak = await db.get("meta", "offline_streak");
+                    if (offlineLevel && offlineStreak) {
+                        try {
+                            await saveLevelProgress(parseInt(offlineLevel, 10), parseInt(offlineStreak, 10));
+                            await db.put("meta", "false", "pending_sync");
+                        } catch (e) {
+                            console.error("Failed to sync up progress", e);
+                        }
+                    }
+                }
+
                 const lastSynced = await db.get("meta", "last_synced_level") || 0;
 
                 const res = await fetch(`/api/sync/down?after=${lastSynced}`);

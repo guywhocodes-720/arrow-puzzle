@@ -12,7 +12,7 @@ import {
   generateProceduralLevelAsync
 } from "@/types/game";
 import { Cell } from "./Cell";
-import { dbHelpers } from "@/utils/indexedDB";
+import { dbHelpers, initDB } from "@/utils/indexedDB";
 import { GameHeader } from "./Board/GameHeader";
 import { GameControls } from "./Board/GameControls";
 import {
@@ -159,7 +159,16 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
         c => c !== null && c.id !== clickedCell.id
       );
       if (remainingAfterExit.length === 0) {
-        saveLevelProgress(levelNumber + 1, nextStreak);
+        initDB().then(db => {
+          db.put("meta", (levelNumber + 1).toString(), "offline_level");
+          db.put("meta", nextStreak.toString(), "offline_streak");
+          db.put("meta", "true", "pending_sync");
+        }).catch(() => {});
+        saveLevelProgress(levelNumber + 1, nextStreak)
+          .then(() => {
+            initDB().then(db => db.put("meta", "false", "pending_sync")).catch(() => {});
+          })
+          .catch(() => {});
       }
 
       setExitingCellIds((prev) => [...prev, clickedCell.id]);
@@ -184,7 +193,15 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
         if (newLives <= 0) {
           setIsGameOver(true);
           if (!isGameOver) {
-            saveLevelLoss();
+            initDB().then(db => {
+              db.put("meta", "0", "offline_streak");
+              db.put("meta", "true", "pending_sync");
+            }).catch(() => {});
+            saveLevelLoss()
+              .then(() => {
+                initDB().then(db => db.put("meta", "false", "pending_sync")).catch(() => {});
+              })
+              .catch(() => {});
           }
         }
         return newLives;

@@ -10,12 +10,28 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
+const dynamicRevision = crypto.randomUUID();
+
 const serwist = new Serwist({
-    precacheEntries: self.__SW_MANIFEST,
+    precacheEntries: [
+        ...(self.__SW_MANIFEST || []),
+        { url: '/', revision: dynamicRevision },
+        { url: '/play', revision: dynamicRevision },
+    ],
     skipWaiting: true,
     clientsClaim: true,
     navigationPreload: true,
-    runtimeCaching: defaultCache
+    runtimeCaching: defaultCache,
+    fallbacks: {
+        entries: [
+            {
+                url: '/~offline',
+                matcher({ request }) {
+                    return request.destination === 'document';
+                },
+            },
+        ],
+    },
 })
 
 serwist.addEventListeners();

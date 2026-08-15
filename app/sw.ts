@@ -17,6 +17,7 @@ const serwist = new Serwist({
         ...(self.__SW_MANIFEST || []),
         { url: '/', revision: dynamicRevision },
         { url: '/play', revision: dynamicRevision },
+        { url: '/manifest.webmanifest', revision: dynamicRevision },
     ],
     skipWaiting: true,
     clientsClaim: true,

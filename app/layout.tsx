@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NavbarClient } from "@/components/NavbarClient";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 import Script from "next/script";
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <NavbarClient />
           <div className="flex-1 flex flex-col w-full">
+            <Analytics />
             {children}
           </div>
           {/* Footer */}

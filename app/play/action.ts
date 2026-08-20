@@ -43,13 +43,35 @@ export async function saveLevelProgress(newLevel: number, currentStreak: number)
             const newGamesPlayed = (stats?.games_played || 0) + 1;
             const newWinRate = Math.round((newPuzzlesSolved / newGamesPlayed) * 100);
 
+            const todayStr = new Date().toISOString().split('T')[0];
+            let newDailyStreak = stats?.daily_streak || 0;
+            const lastPlayed = stats?.last_played_date;
+
+            if (lastPlayed !== todayStr) {
+                if (lastPlayed) {
+                    const lastDate = new Date(lastPlayed);
+                    const todayDate = new Date(todayStr);
+                    const diffTime = Math.abs(todayDate.getTime() - lastDate.getTime());
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays === 1) {
+                        newDailyStreak += 1;
+                    } else {
+                        newDailyStreak = 1;
+                    }
+                } else {
+                    newDailyStreak = 1;
+                }
+            }
+
             const { error: statsError } = await supabase.from("game_stats").upsert({
                 user_id: user.id,
                 puzzles_solved: newPuzzlesSolved,
                 games_played: newGamesPlayed,
                 win_rate: newWinRate,
-                current_streak: currentStreak,
+                flawless_streak: currentStreak,
                 highest_streak: bestStreak,
+                daily_streak: newDailyStreak,
+                last_played_date: todayStr,
                 updated_at: new Date().toISOString(),
             }, { onConflict: "user_id" });
 
@@ -60,6 +82,29 @@ export async function saveLevelProgress(newLevel: number, currentStreak: number)
         revalidatePath("/leaderboard");
     } catch (err) {
         console.error("Error in saveLevelProgress action:", err);
+    }
+}
+
+export async function breakFlawlessStreak() {
+    try {
+        const cookieStore = await cookies();
+        cookieStore.set('guest_streak', '0', { maxAge: 60 * 60 * 24 * 30 });
+
+        const supabase = createClient(cookieStore);
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            const { error: statsError } = await supabase.from("game_stats").update({
+                flawless_streak: 0,
+                updated_at: new Date().toISOString(),
+            }).eq("user_id", user.id);
+
+            if (statsError) {
+                console.error("Failed to break flawless streak:", statsError);
+            }
+        }
+    } catch (err) {
+        console.error("Error in breakFlawlessStreak action:", err);
     }
 }
 
@@ -87,7 +132,7 @@ export async function saveLevelLoss() {
                 puzzles_solved: currentSolved,
                 games_played: newGamesPlayed,
                 win_rate: newWinRate,
-                current_streak: 0,
+                flawless_streak: 0,
                 highest_streak: stats?.highest_streak || 0,
                 updated_at: new Date().toISOString(),
             }, { onConflict: "user_id" });

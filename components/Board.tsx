@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { saveLevelProgress, saveLevelLoss } from "@/app/play/action";
+import { saveLevelProgress, saveLevelLoss, breakFlawlessStreak } from "@/app/play/action";
 import { useSound } from "@/hooks/useSound";
 
 interface BoardProps {
@@ -186,6 +186,15 @@ export const Board: React.FC<BoardProps> = ({ initialLevel = 1, initialStreak = 
       // Wrong click: immediately break the streak
       setStreak(0);
       streakRef.current = 0;
+      initDB().then(db => {
+        db.put("meta", "0", "offline_streak");
+        db.put("meta", "true", "pending_sync");
+      }).catch(() => {});
+      breakFlawlessStreak()
+        .then(() => {
+          initDB().then(db => db.put("meta", "false", "pending_sync")).catch(() => {});
+        })
+        .catch(() => {});
       setErrorCellId(clickedCell.id);
 
       setLives((prevLives) => {

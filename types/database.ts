@@ -42,8 +42,10 @@ export interface Database {
           puzzles_solved: number
           games_played: number
           win_rate: number
-          current_streak: number
+          flawless_streak: number
           highest_streak: number
+          daily_streak: number
+          last_played_date: string | null
           updated_at: string
         }
         Insert: {
@@ -51,8 +53,10 @@ export interface Database {
           puzzles_solved?: number
           games_played?: number
           win_rate?: number
-          current_streak?: number
+          flawless_streak?: number
           highest_streak?: number
+          daily_streak?: number
+          last_played_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -60,8 +64,10 @@ export interface Database {
           puzzles_solved?: number
           games_played?: number
           win_rate?: number
-          current_streak?: number
+          flawless_streak?: number
           highest_streak?: number
+          daily_streak?: number
+          last_played_date?: string | null
           updated_at?: string
         }
         Relationships: []

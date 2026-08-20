@@ -30,10 +30,11 @@ export default async function DashboardPage() {
 
   const puzzlesSolved = stats?.puzzles_solved || 0;
   const winRate = stats?.win_rate || 0;
-  const currentStreak = stats?.current_streak || 0;
+  const activeFlawless = stats?.flawless_streak || 0;
+  const dailyStreak = stats?.daily_streak || 0;
 
   const highestLevel = profile?.highest_level || 1;
-  const flawlessStreak = profile?.highest_streak || 0;
+  const highestFlawlessStreak = profile?.highest_streak || 0;
 
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || "Player";
 
@@ -112,7 +113,7 @@ export default async function DashboardPage() {
             </div>
 
             <div className="flex items-center justify-between z-10 mb-8">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Flawless Streak</span>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Highest Flawless</span>
               <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary">
                 <Flame className="w-5 h-5" />
               </div>
@@ -120,7 +121,7 @@ export default async function DashboardPage() {
 
             <div className="flex flex-col z-10">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-5xl font-extrabold tracking-tight text-primary">{flawlessStreak}</span>
+                <span className="text-5xl font-extrabold tracking-tight text-primary">{highestFlawlessStreak}</span>
                 <Flame className="w-6 h-6 text-primary" />
               </div>
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">Max Consecutive Wins</span>
@@ -130,7 +131,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Secondary Stats Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
 
           {/* Puzzles Solved Card */}
           <div className="flex flex-col p-6 rounded-2xl bg-popover/60 border border-border/80 shadow-lg relative overflow-hidden group">
@@ -156,16 +157,28 @@ export default async function DashboardPage() {
             <span className="text-4xl font-extrabold tracking-tight text-primary z-10">{winRate}%</span>
           </div>
 
-          {/* Current Streak Card */}
+          {/* Active Flawless Card */}
+          <div className="flex flex-col p-6 rounded-2xl bg-popover/60 border border-border/80 shadow-lg relative overflow-hidden group">
+            <div className="absolute right-2 top-2 opacity-5 group-hover:opacity-15 transition-opacity">
+              <Flame className="w-24 h-24 text-rose-500" />
+            </div>
+            <div className="flex items-center gap-2 mb-4 text-muted-foreground z-10">
+              <Flame className="w-4 h-4 text-rose-500" />
+              <span className="text-xs font-bold uppercase tracking-widest">Flawless</span>
+            </div>
+            <span className="text-4xl font-extrabold tracking-tight text-rose-500 z-10">{activeFlawless}</span>
+          </div>
+
+          {/* Daily Streak Card */}
           <div className="flex flex-col p-6 rounded-2xl bg-popover/60 border border-border/80 shadow-lg relative overflow-hidden group">
             <div className="absolute right-2 top-2 opacity-5 group-hover:opacity-15 transition-opacity">
               <Zap className="w-24 h-24 text-amber-500" />
             </div>
             <div className="flex items-center gap-2 mb-4 text-muted-foreground z-10">
               <Zap className="w-4 h-4 text-amber-500" />
-              <span className="text-xs font-bold uppercase tracking-widest">Current Streak</span>
+              <span className="text-xs font-bold uppercase tracking-widest">Daily Streak</span>
             </div>
-            <span className="text-4xl font-extrabold tracking-tight text-amber-500 z-10">{currentStreak}</span>
+            <span className="text-4xl font-extrabold tracking-tight text-amber-500 z-10">{dailyStreak}</span>
           </div>
 
         </div>
